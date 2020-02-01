@@ -5,6 +5,8 @@ import uvicorn
 from starlette.requests import Request
 from starlette.responses import Response
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
+from starlette.responses import Response
+
 
 import jwt
 
@@ -32,6 +34,28 @@ def get_current_user(request: Request) -> str:
     username = jwt.decode(jwt_token, key=JWT_SECRET, algorithms=['HS256']).get('username')
     return username
 
+form_data = '''
+<!doctype html>
+<html>
+ <head>
+ </head>
+ <body>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <div>
+      <label for="file">Choose file to upload</label>
+      <input type="file" id="file" name="file" multiple>
+    </div>
+    <div>
+      <button>Submit</button>
+    </div>
+  </form>
+ </body>
+</html>
+'''
+
+@app.get('/')
+def form():
+    return Response(content=form_data, media_type="text/html")
 
 # Cadastro de usuário
 @app.post('/register')
@@ -119,4 +143,4 @@ async def upload_file(current_user: str = Depends(get_current_user), file: Uploa
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
